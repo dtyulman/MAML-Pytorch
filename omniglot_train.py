@@ -30,7 +30,7 @@ def main(args):
         ('linear', [args.n_way, 64])
     ]
 
-    device = torch.device('cuda')
+    device = torch.device('cuda') if torch.cuda.is_available() else 'cpu'
     maml = Meta(args, config).to(device)
 
     tmp = filter(lambda x: x.requires_grad, maml.parameters())
@@ -54,10 +54,10 @@ def main(args):
         # set traning=True to update running_mean, running_variance, bn_weights, bn_bias
         accs = maml(x_spt, y_spt, x_qry, y_qry)
 
-        if step % 50 == 0:
+        if step % 10 == 0:
             print('step:', step, '\ttraining acc:', accs)
 
-        if step % 500 == 0:
+        if step % 100 == 0:
             accs = []
             for _ in range(1000//args.task_num):
                 # test
